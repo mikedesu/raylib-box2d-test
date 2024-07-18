@@ -78,13 +78,14 @@ int main() {
   fixtureDef.shape = &dynamicBox;
   fixtureDef.density = 1.0f;
   fixtureDef.friction = 1.0f;
+  fixtureDef.restitution = 0.0f;
   // fixtureDef.friction = 0.3f;
   body->CreateFixture(&fixtureDef);
 
   float timeStep = 1.0f / 60.0f;
 
-  int velocityIterations = 5;
-  int positionIterations = 3;
+  int velocityIterations = 8;
+  int positionIterations = 5;
 
   while (!WindowShouldClose()) {
     const int horizontal_speed = 40;
@@ -115,7 +116,9 @@ int main() {
 
     world.Step(timeStep, velocityIterations, positionIterations);
 
-    b2Vec2 position = body->GetPosition();
+    // b2Vec2 position = body->GetLocalCenter();
+    b2Vec2 position = body->GetWorldCenter();
+    //  b2Vec2 position = body->GetPosition();
     float angle = body->GetAngle();
 
     BeginDrawing();
@@ -132,42 +135,48 @@ int main() {
     // *)groundBody->GetFixtureList()->GetShape();
 
     // draw a rectangle representing the dynamic body
-    b2Vec2 v0 = groundBody->GetPosition();
-    DrawRectangle(v0.x, v0.y, 10, 10, RED);
-    // get the vertices of the ground body
+    // b2Vec2 v0 = groundBody->GetPosition();
+    b2Vec2 v0 = groundBody->GetWorldCenter();
+    // DrawRectangle(v0.x, v0.y, 10, 10, RED);
+    //  get the vertices of the ground body
 
-    b2Fixture *fixture = groundBody->GetFixtureList();
+    // b2Fixture *fixture = groundBody->GetFixtureList();
     for (b2Fixture *f = groundBody->GetFixtureList(); f; f = f->GetNext()) {
       b2PolygonShape *shape = (b2PolygonShape *)f->GetShape();
       b2Vec2 v1 = shape->m_vertices[0];
       b2Vec2 v2 = shape->m_vertices[1];
       b2Vec2 v3 = shape->m_vertices[2];
       b2Vec2 v4 = shape->m_vertices[3];
-      // cout << "v0: " << v0.x << ", " << v0.y << " -- ";
-      // cout << "v1: " << v1.x << ", " << v1.y << " -- ";
-      // cout << "v2: " << v2.x << ", " << v2.y << " -- ";
-      // cout << "v3: " << v3.x << ", " << v3.y << " -- ";
-      // cout << "v4: " << v4.x << ", " << v4.y << endl;
 
-      // DrawLine(v1.x, v1.y, v2.x, v2.y, GREEN);
-      // DrawLine(v1.x, v1.y, v3.x, v3.y, GREEN);
-      // DrawLine(v1.x, v1.y, v4.x, v4.y, GREEN);
-      // DrawLine(v2.x, v2.y, v3.x, v3.y, GREEN);
-      // DrawLine(v2.x, v2.y, v4.x, v4.y, GREEN);
-      // DrawLine(v3.x, v3.y, v4.x, v4.y, GREEN);
+      DrawLine(v0.x + v1.x, v0.y + v1.y, v0.x + v2.x, v0.y + v2.y, GREEN);
+      DrawLine(v0.x + v2.x, v0.y + v2.y, v0.x + v3.x, v0.y + v3.y, RED);
+      DrawLine(v0.x + v3.x, v0.y + v3.y, v0.x + v4.x, v0.y + v4.y, BLUE);
+      DrawLine(v0.x + v4.x, v0.y + v4.y, v0.x + v1.x, v0.y + v1.y, PURPLE);
 
-      DrawRectangle(v0.x + v1.x, v0.y + v1.y - 20, 20, 20, GREEN);
-      DrawRectangle(v0.x + v2.x, v0.y + v2.y - 20, 20, 20, BLUE);
-      DrawRectangle(v0.x + v3.x, v0.y + v3.y - 20, 20, 20, PURPLE);
-      DrawRectangle(v0.x + v4.x, v0.y + v4.y - 20, 20, 20, YELLOW);
+      DrawLine(v0.x, v0.y, v0.x + v1.x, v0.y + v1.y, GREEN);
+      DrawLine(v0.x, v0.y, v0.x + v2.x, v0.y + v2.y, RED);
+      DrawLine(v0.x, v0.y, v0.x + v3.x, v0.y + v3.y, BLUE);
+      DrawLine(v0.x, v0.y, v0.x + v4.x, v0.y + v4.y, PURPLE);
+    }
 
-      // DrawRectangle(v2.x, v2.y, 10, 10, GREEN);
-      // DrawRectangle(v3.x, v3.y, 10, 10, PURPLE);
-      // DrawRectangle(v4.x, v4.y, 10, 10, BLUE);
+    v0 = body->GetWorldCenter();
+    // fixture = body->GetFixtureList();
+    for (b2Fixture *f = body->GetFixtureList(); f; f = f->GetNext()) {
+      b2PolygonShape *shape = (b2PolygonShape *)f->GetShape();
+      b2Vec2 v1 = shape->m_vertices[0];
+      b2Vec2 v2 = shape->m_vertices[1];
+      b2Vec2 v3 = shape->m_vertices[2];
+      b2Vec2 v4 = shape->m_vertices[3];
 
-      // DrawLine(v1.x, v1.y, v2.x, v2.y, RED);
-      // DrawLine(v1.x, v1.y, v2.x, v2.y, WHITE);
-      // DrawLine(v2.x, v2.y, v3.x, v3.y, BLUE);
+      DrawLine(v0.x + v1.x, v0.y + v1.y, v0.x + v2.x, v0.y + v2.y, GREEN);
+      DrawLine(v0.x + v2.x, v0.y + v2.y, v0.x + v3.x, v0.y + v3.y, RED);
+      DrawLine(v0.x + v3.x, v0.y + v3.y, v0.x + v4.x, v0.y + v4.y, BLUE);
+      DrawLine(v0.x + v4.x, v0.y + v4.y, v0.x + v1.x, v0.y + v1.y, PURPLE);
+
+      DrawLine(v0.x, v0.y, v0.x + v1.x, v0.y + v1.y, GREEN);
+      DrawLine(v0.x, v0.y, v0.x + v2.x, v0.y + v2.y, RED);
+      DrawLine(v0.x, v0.y, v0.x + v3.x, v0.y + v3.y, BLUE);
+      DrawLine(v0.x, v0.y, v0.x + v4.x, v0.y + v4.y, PURPLE);
     }
 
     // cout << "v1: " << v1.x << ", " << v1.y << " -- ";
@@ -187,15 +196,28 @@ int main() {
     // const float box_width = 2.0f;
     // const float box_height = 2.0f;
 
-    const float box_x = position.x - box_width / 2.0f;
-    const float box_y = position.y - box_height / 2.0f;
+    // const float box_x = position.x;
+    // const float box_y = position.y;
+    // const float box_x0 = position.x - box_width / 2.0f;
+    // const float box_y0 = position.y - box_height / 2.0f;
+    // const float box_x1 = position.x + box_width / 2.0f;
+    // const float box_y1 = position.y - box_height / 2.0f;
+    // const float box_x2 = position.x + box_width / 2.0f;
+    // const float box_y2 = position.y + box_height / 2.0f;
+    // const float box_x3 = position.x - box_width / 2.0f;
+    // const float box_y3 = position.y + box_height / 2.0f;
 
     // DrawTexturePro(texture, {0, 0, (float)texture.width,
     // (float)texture.height},
     //                {box_x, box_y, (float)texture.width,
     //                (float)texture.height}, {0, 0}, angle, WHITE);
 
-    DrawRectangle(box_x, box_y, box_width, box_height, RED);
+    // DrawRectangle(box_x, box_y, box_width, box_height, RED);
+    // DrawRectangleLines(box_x0, box_y0, box_width, box_height, RED);
+    // DrawLine(box_x, box_y, box_x1, box_y1, RED);
+    // DrawLine(box_x, box_y, box_x2, box_y2, RED);
+    // DrawLine(box_x, box_y, box_x3, box_y3, RED);
+    // DrawLine(box_x, box_y, box_x0, box_y0, RED);
 
     EndMode2D();
     EndTextureMode();
@@ -203,8 +225,8 @@ int main() {
     ClearBackground(RAYWHITE);
     DrawTextureRec(
         target.texture,
-        {0, 0, (float)target.texture.width, (float)target.texture.height},
-        //{0, 0, (float)target.texture.width, (float)-target.texture.height},
+        //{0, 0, (float)target.texture.width, (float)target.texture.height},
+        {0, 0, (float)target.texture.width, (float)-target.texture.height},
         {0, 0}, WHITE);
 
     if (debug_on) {
